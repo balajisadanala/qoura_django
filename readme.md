@@ -2,7 +2,7 @@
 
 A feature-rich Q&A platform inspired by Quora, built with Django.
 
-![Screenshot](screenshot.png)
+- <img src="screenshots/quora.jpg" alt="home_page" width="1000px" />
 
 ## Features
 
