@@ -3,6 +3,7 @@
 A feature-rich Q&A platform inspired by Quora, built with Django.
 
 - <img src="screenshots/quora.jpg" alt="home_page" width="1000px" />
+- <img src="screenshots/answer.jpg" alt="home_page" width="1000px" />
 
 ## Features
 
@@ -11,12 +12,13 @@ A feature-rich Q&A platform inspired by Quora, built with Django.
   - logout
 
 - **Question System**
-  - Post, view
+  - Post, view , Edit, Delete
   - Rich text descriptions
   - Upvote/downvote questions
+  - total upvotes count
 
 - **Answer System**
-  - Post answers to questions
+  - Post answers to questions - view , Edit, Delete
   - Voting on answers
   - Answer on the Feed itslef or Question seperately
 
