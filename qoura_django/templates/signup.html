@@ -1,0 +1,112 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Sign Up</h2>
+    <form method="post" class="row g-3 needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="col-md-6">
+            <label for="firstName" class="form-label">First name</label>
+            {{ form.first_name }}
+            <div class="invalid-feedback">Please enter your first name.</div>
+        </div>
+
+        <div class="col-md-6">
+            <label for="lastName" class="form-label">Last name</label>
+            {{ form.last_name }}
+            <div class="invalid-feedback">Please enter your last name.</div>
+        </div>
+
+        <div class="col-12">
+            <div class="form-floating">
+                {{ form.email }}
+                <label for="floatingEmail">Email address</label>
+                <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating">
+                {{ form.password1 }}
+                <label for="floatingPassword1">Password</label>
+                <div class="invalid-feedback">Please enter a password.</div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating">
+                {{ form.password2 }}
+                <label for="floatingPassword2">Confirm Password</label>
+                <div class="invalid-feedback">Passwords must match.</div>
+            </div>
+        </div>
+
+
+        <div class="col-12">
+            <button class="btn btn-primary" type="submit">Sign Up</button>
+        </div>
+    </form>
+    <br>
+    <div class="col-12">
+        <a href = "{% url 'login' %}"><button class="btn btn-secondary">login</button></a>
+    </div>
+</div>
+
+<script>
+
+(() => {
+  'use strict'
+  const forms = document.querySelectorAll('.needs-validation')
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector(".needs-validation");
+    const password1 = document.getElementById("floatingPassword1");
+    const password2 = document.getElementById("floatingPassword2");
+    const mismatchFeedback = document.getElementById("passwordMismatchFeedback");
+
+    form.addEventListener("submit", function (e) {
+        if (password1.value !== password2.value) {
+            e.preventDefault();
+            e.stopPropagation();
+            password2.classList.add("is-invalid");
+            mismatchFeedback.style.display = "block";
+        } else {
+            password2.classList.remove("is-invalid");
+            password2.classList.add("is-valid");
+            mismatchFeedback.style.display = "none";
+        }
+
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        form.classList.add("was-validated");
+    });
+
+    password2.addEventListener("input", function () {
+        if (password1.value !== password2.value) {
+            password2.classList.add("is-invalid");
+            mismatchFeedback.style.display = "block";
+        } else {
+            password2.classList.remove("is-invalid");
+            mismatchFeedback.style.display = "none";
+        }
+    });
+
+});
+
+</script>
+{% endblock %}

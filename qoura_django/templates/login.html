@@ -1,0 +1,68 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2>Login</h2>
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="form-floating mb-3">
+                {{ form.username }}
+                <label for="floatingLoginEmail">Email address</label>
+                <div class="invalid-feedback">
+                    Please enter your email.
+                </div>
+            </div>
+
+            <div class="form-floating mb-3">
+                {{ form.password }}
+                <label for="floatingLoginPassword">Password</label>
+                <div class="invalid-feedback">
+                    Please enter your password.
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+        <br>
+    <div class="col-12">
+        <a href = "{% url 'signup' %}"><button class="btn btn-secondary">Sign up</button></a>
+    </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const loginForm = document.querySelector(".needs-validation");
+        const emailField = document.getElementById("floatingLoginEmail");
+        const passwordField = document.getElementById("floatingLoginPassword");
+
+        loginForm.addEventListener("submit", function (e) {
+            let valid = true;
+
+            if (!emailField.value.trim()) {
+                emailField.classList.add("is-invalid");
+                valid = false;
+            } else {
+                emailField.classList.remove("is-invalid");
+                emailField.classList.add("is-valid");
+            }
+
+            if (!passwordField.value.trim()) {
+                passwordField.classList.add("is-invalid");
+                valid = false;
+            } else {
+                passwordField.classList.remove("is-invalid");
+                passwordField.classList.add("is-valid");
+            }
+
+            if (!valid) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            loginForm.classList.add("was-validated");
+        });
+    });
+    </script>
+
+{% endblock %}
