@@ -30,6 +30,7 @@
             <div class="form-floating">
                 {{ form.password1 }}
                 <label for="floatingPassword1">Password</label>
+                {{ form.password1.errors }}
                 <div class="invalid-feedback">Please enter a password.</div>
             </div>
         </div>
@@ -38,6 +39,7 @@
             <div class="form-floating">
                 {{ form.password2 }}
                 <label for="floatingPassword2">Confirm Password</label>
+                {{ form.password2.errors }}
                 <div class="invalid-feedback">Passwords must match.</div>
             </div>
         </div>
