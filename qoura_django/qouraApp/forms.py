@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from .models import *
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(
@@ -71,3 +72,18 @@ class LoginForm(AuthenticationForm):
             'id': 'floatingLoginPassword'
         })
     )
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Questions
+        fields = ['question', 'description']
+        widgets = {
+            'question': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'What would you like to ask?'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Add details...'
+            }),
+        }

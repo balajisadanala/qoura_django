@@ -1,5 +1,7 @@
 {% extends 'index.html' %}
 {% block content %}
+{% load filters %}
+
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Qoura_Django</a>
@@ -32,4 +34,63 @@
       </div>
     </div>
   </nav>
+
+
+  <div class="container mt-4">
+    <!-- Question Form at Top -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.question }}
+                <div class="mt-2">
+                    {{ form.description }}
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Post Question</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Questions Feed -->
+    {% for question in questions %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <!-- Question Header -->
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h5 class="card-title">{{ question.question }}</h5>
+                    <p class="text-muted small">
+                        Posted by {{ question.user.username }} on {{ question.created_at|date:"M d, Y" }}
+                    </p>
+                </div>
+                <div class="d-flex">
+                    <span class="badge bg-secondary me-2">{{ question.likes }} votes</span>
+                </div>
+            </div>
+
+            <!-- Question Description -->
+            <p class="card-text mt-2"><strong>{{ question.description }}</strong></p>
+
+            <!-- Voting and Answers -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div class="btn-group" role="group">
+                <a href="{% url 'vote_question' question.id 'up' %}"
+                   class="btn btn-sm btn-outline-success {% if question|user_vote_status:request.user == 'upvoted' %}active{% endif %}">
+                    Upvote ({{ question.upvotes.count }})
+                </a>
+                <a href="{% url 'vote_question' question.id 'down' %}"
+                   class="btn btn-sm btn-outline-danger {% if question|user_vote_status:request.user == 'downvoted' %}active{% endif %}">
+                    Downvote ({{ question.downvotes.count }}) {{request.user.question}}
+                </a>
+            </div>
+                <div>
+                    <span class="text-muted">5 answers</span> <!-- Replace with actual count later -->
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-info">No questions yet. Be the first to ask!</div>
+    {% endfor %}
+</div>
 {% endblock %}
