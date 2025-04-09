@@ -2,8 +2,8 @@
 
 A feature-rich Q&A platform inspired by Quora, built with Django.
 
-- <img src="screenshots/quora.jpg" alt="home_page" width="1000px" />
-- <img src="screenshots/answer.jpg" alt="home_page" width="1000px" />
+- <img src="screenshots/quora.jpg" alt="home_page" width="900px" />
+- <img src="screenshots/answer.jpg" alt="home_page" width="900px" />
 
 ## Features
 
@@ -22,7 +22,7 @@ A feature-rich Q&A platform inspired by Quora, built with Django.
   - Voting on answers
   - Answer on the Feed itslef or Question seperately
 
-- **Community Features**
+- **Features**
   - Responsive design
 
 ## Technologies Used
