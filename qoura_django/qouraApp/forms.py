@@ -74,14 +74,16 @@ class LoginForm(AuthenticationForm):
         widget=forms.EmailInput(attrs={
             'class': 'form-control',
             'placeholder': 'Email',
-            'id': 'floatingLoginEmail'
+            'id': 'floatingLoginEmail',
+            'value':'secure@user.com'
         })
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'placeholder': 'Password',
-            'id': 'floatingLoginPassword'
+            'id': 'floatingLoginPassword',
+            'value':'#1234asdf'
         })
     )
 class QuestionForm(forms.ModelForm):
@@ -94,11 +96,16 @@ class QuestionForm(forms.ModelForm):
                 'placeholder': 'What would you like to ask?'
             }),
             'description': forms.Textarea(attrs={
-                'class': 'form-control',
+                'class': 'form-control-custom',
                 'rows': 3,
-                'placeholder': 'Add details...'
+                'placeholder': 'Add details...(optional)',
+                'id': 'description-textarea'
+
             }),
         }
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['description'].required = False
 
 class AnswerForm(forms.ModelForm):
     class Meta:

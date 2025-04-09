@@ -11,6 +11,52 @@
       .beta {
         background-color: #f9f9f9;
       }
+      .form-control-custom {
+        display: block;
+          width: 100%;
+          padding: .375rem .75rem;
+          font-size: 1rem;
+          font-weight: 400;
+          line-height: 1.5;
+          color: var(--bs-body-color);
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          background-color: var(--bs-body-bg);
+          background-clip: padding-box;
+          border: var(--bs-border-width) solid var(--bs-border-color);
+          border-radius: var(--bs-border-radius);
+          transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+      }
+      .btn-outline-success.active, .btn-outline-danger.active {
+        color: white !important;
+    }
+
+    .btn-outline-success.active {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-outline-danger.active {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    button.vote-up, button.vote-down {
+        transition: all 0.2s ease;
+    }
+    .vote-count {
+      transition: all 0.3s ease;
+  }
+
+  .vote-updated {
+      transform: scale(1.1);
+      background-color: #0d6efd !important; /* Highlight color */
+  }
+
+  .bg-negative {
+      background-color: #dc3545 !important;
+  }
     </style>
     <div class="container-fluid gx-0">
       {% if user.is_authenticated %}
@@ -45,6 +91,76 @@
       {% endif %}
         {% block content %}{% endblock %}
     </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+     
+        const descriptionField = document.getElementById('description-textarea');
+        if (descriptionField) {
+            descriptionField.removeAttribute('required');
+        }
+        document.querySelectorAll('.question-voting button').forEach(button => {
+          button.addEventListener('click', function() {
+              const votingContainer = this.closest('.question-voting');
+              const questionId = votingContainer.getAttribute('data-id');
+              const voteType = this.getAttribute('data-vote-type');
+
+              voteHandler(`/question/${questionId}/vote/${voteType}/`, this, votingContainer);
+          });
+      });
+
+      // Handle answer voting
+      document.querySelectorAll('.answer-voting button').forEach(button => {
+          button.addEventListener('click', function() {
+              const votingContainer = this.closest('.answer-voting');
+              const answerId = votingContainer.getAttribute('data-id');
+              const voteType = this.getAttribute('data-vote-type');
+
+              voteHandler(`/answer/${answerId}/vote/${voteType}/`, this, votingContainer);
+          });
+      });
+
+      function voteHandler(url, clickedButton, container) {
+          fetch(url, {
+              method: 'POST',
+              headers: {
+                  'X-CSRFToken': '{{ csrf_token }}',
+                  'Content-Type': 'application/json'
+              },
+              credentials: 'same-origin'
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.status === 'success') {
+                  container.querySelector('.upvote-count').textContent = data.upvotes;
+                  container.querySelector('.downvote-count').textContent = data.downvotes;
+
+                  const questionId = container.getAttribute('data-id');
+
+                  const voteCountBadge = document.querySelector(`.vote-count[data-id="${questionId}"]`);
+                  if (voteCountBadge) {
+                      voteCountBadge.textContent = `${data.upvotes} votes`;
+                      voteCountBadge.classList.add('vote-updated');
+                      setTimeout(() => {
+                          voteCountBadge.classList.remove('vote-updated');
+                      }, 300)
+                  }
+                  const upButton = container.querySelector('.vote-up');
+                  const downButton = container.querySelector('.vote-down');
+
+                  upButton.classList.remove('active');
+                  downButton.classList.remove('active');
+
+                  if (data.user_vote_status === 'upvoted') {
+                      upButton.classList.add('active');
+                  } else if (data.user_vote_status === 'downvoted') {
+                      downButton.classList.add('active');
+                  }
+              }
+          })
+          .catch(error => console.error('Error:', error));
+      }
+      });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
   </body>
 </html>

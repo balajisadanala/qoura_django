@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Questions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.CharField(max_length=400)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     upvotes = models.ManyToManyField(User, related_name='upvoted_questions', blank=True)
     downvotes = models.ManyToManyField(User, related_name='downvoted_questions', blank=True)
     posted_date = models.DateTimeField(auto_now_add=True)
@@ -25,7 +25,7 @@ class Questions(models.Model):
 class Answer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Questions, on_delete=models.CASCADE, related_name='answers')
-    content = models.TextField()
+    content = models.TextField(blank=True, null=True)
     upvotes = models.ManyToManyField(User, related_name='upvoted_answers', blank=True)
     downvotes = models.ManyToManyField(User, related_name='downvoted_answers', blank=True)
     posted_date = models.DateTimeField(auto_now_add=True)

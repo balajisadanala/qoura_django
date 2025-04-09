@@ -29,23 +29,27 @@
                     </p>
                 </div>
                 <div class="d-flex">
-                    <span class="badge bg-secondary me-2">{{ question.upvotes.count }} votes</span>
-                </div>
+                  <span class="badge bg-secondary me-2 vote-count" data-id="{{ question.id }}">
+                      {{ question.upvotes.count }} votes
+                  </span>
+              </div>
             </div>
 
             <p class="card-text mt-2">{{ question.description }}</p>
 
             <div class="d-flex justify-content-between align-items-center mt-3">
-                <div class="btn-group">
-                    <a href="{% url 'vote_question' question.id 'up' %}"
-                       class="btn btn-sm btn-outline-success {% if question|user_vote_status:request.user == 'upvoted' %}active{% endif %}">
-                        <i class="bi bi-arrow-up"></i> Upvote ({{ question.upvotes.count }})
-                    </a>
-                    <a href="{% url 'vote_question' question.id 'down' %}"
-                       class="btn btn-sm btn-outline-danger {% if question|user_vote_status:request.user == 'downvoted' %}active{% endif %}">
-                        <i class="bi bi-arrow-down"></i> Downvote ({{ question.downvotes.count }})
-                    </a>
-                </div>
+              <div class="btn-group question-voting" data-id="{{ question.id }}">
+                <button class="btn btn-sm btn-outline-success vote-up
+                        {% if question|user_vote_status:request.user == 'upvoted' %}active{% endif %}"
+                        data-vote-type="up">
+                    <i class="bi bi-arrow-up"></i> Upvote (<span class="upvote-count">{{ question.upvotes.count }}</span>)
+                </button>
+                <button class="btn btn-sm btn-outline-danger vote-down
+                        {% if question|user_vote_status:request.user == 'downvoted' %}active{% endif %}"
+                        data-vote-type="down">
+                    <i class="bi bi-arrow-down"></i> Downvote (<span class="downvote-count">{{ question.downvotes.count }}</span>)
+                </button>
+            </div>
 
                 <div>
                     <a href="{% url 'question_detail' question.id %}" class="btn btn-sm btn-outline-primary">

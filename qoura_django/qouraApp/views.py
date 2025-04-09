@@ -1,3 +1,5 @@
+import json
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import login, authenticate
 from .forms import SignUpForm, LoginForm,QuestionForm,AnswerForm
@@ -40,6 +42,7 @@ def user_login(request):
 def home(request):
     if request.method == 'POST':
         form = QuestionForm(request.POST)
+        print("Formvlid",form.is_valid())
         if form.is_valid():
             question = form.save(commit=False)
             question.user = request.user
@@ -58,40 +61,76 @@ def home(request):
 def vote_question(request, question_id, vote_type):
     question = get_object_or_404(Questions, id=question_id)
     user = request.user
+    response_data = {'status': 'success'}
 
     if vote_type == 'up':
-        if question.downvotes.filter(id=user.id).exists():
-            question.downvotes.remove(user)
-        question.upvotes.add(user)
-    elif vote_type == 'down':
         if question.upvotes.filter(id=user.id).exists():
             question.upvotes.remove(user)
-        question.downvotes.add(user)
-    elif vote_type == 'remove':
-        question.upvotes.remove(user)
-        question.downvotes.remove(user)
+            response_data['action'] = 'removed'
+        else:
+            question.upvotes.add(user)
+            response_data['action'] = 'added'
+        if question.downvotes.filter(id=user.id).exists():
+            question.downvotes.remove(user)
+    elif vote_type == 'down':
+        print("down")
+        if question.downvotes.filter(id=user.id).exists():
+            question.downvotes.remove(user)
+            print("dremove")
+            response_data['action'] = 'removed'
+        else:
+            question.downvotes.add(user)
+            print("d added")
+            response_data['action'] = 'added'
+        if question.upvotes.filter(id=user.id).exists():
+            print("at d up removed")
+            question.upvotes.remove(user)
 
-    return redirect('home')
+    response_data.update({
+        'upvotes': question.upvotes.count(),
+        'downvotes': question.downvotes.count(),
+        'net_votes': question.upvotes.count(),
+        'user_vote_status': 'upvoted' if question.upvotes.filter(id=user.id).exists() else
+                           'downvoted' if question.downvotes.filter(id=user.id).exists() else
+                           'none'
+    })
+    return JsonResponse(response_data)
+
 @never_cache
 @login_required
 def vote_answer(request, answer_id, vote_type):
     answer = get_object_or_404(Answer, id=answer_id)
     user = request.user
+    response_data = {'status': 'success'}
 
     if vote_type == 'up':
-        if answer.downvotes.filter(id=user.id).exists():
-            answer.downvotes.remove(user)
-        answer.upvotes.add(user)
-    elif vote_type == 'down':
         if answer.upvotes.filter(id=user.id).exists():
             answer.upvotes.remove(user)
-        answer.downvotes.add(user)
-    elif vote_type == 'remove':
-        answer.upvotes.remove(user)
-        answer.downvotes.remove(user)
+            response_data['action'] = 'removed'
+        else:
+            answer.upvotes.add(user)
+            response_data['action'] = 'added'
+        if answer.downvotes.filter(id=user.id).exists():
+            answer.downvotes.remove(user)
+    elif vote_type == 'down':
+        if answer.downvotes.filter(id=user.id).exists():
+            answer.downvotes.remove(user)
+            response_data['action'] = 'removed'
+        else:
+            answer.downvotes.add(user)
+            response_data['action'] = 'added'
+        if answer.upvotes.filter(id=user.id).exists():
+            answer.upvotes.remove(user)
 
-    return redirect('question_detail', pk=answer.question.id)
-
+    response_data.update({
+        'upvotes': answer.upvotes.count(),
+        'downvotes': answer.downvotes.count(),
+        'net_votes': answer.upvotes.count(),
+        'user_vote_status': 'upvoted' if answer.upvotes.filter(id=user.id).exists() else
+                           'downvoted' if answer.downvotes.filter(id=user.id).exists() else
+                           'none'
+    })
+    return JsonResponse(response_data)
 
 def question_detail(request, question_id):
     question = get_object_or_404(Questions, id=question_id)
@@ -114,21 +153,7 @@ def question_detail(request, question_id):
         'form': form
     })
 
-@login_required
-def vote_answer(request, answer_id, vote_type):
-    answer = get_object_or_404(Answer, id=answer_id)
-    user = request.user
 
-    if vote_type == 'up':
-        if answer.downvotes.filter(id=user.id).exists():
-            answer.downvotes.remove(user)
-        answer.upvotes.add(user)
-    elif vote_type == 'down':
-        if answer.upvotes.filter(id=user.id).exists():
-            answer.upvotes.remove(user)
-        answer.downvotes.add(user)
-
-    return redirect('question_detail', question_id=answer.question.id)
 
 @login_required
 def post_answer(request, question_id):
@@ -142,3 +167,54 @@ def post_answer(request, question_id):
                 content=content
             )
     return redirect('home')
+
+@login_required
+def edit_question(request, pk):
+    question = get_object_or_404(Questions, pk=pk)
+    if question.user != request.user:
+        return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            question.question = data.get('question')
+            question.description = data.get('description')
+            question.save()
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+@login_required
+def delete_question(request, pk):
+    question = get_object_or_404(Questions, pk=pk)
+    if question.user != request.user:
+        return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
+
+    if request.method == 'POST':
+        question.delete()
+        return JsonResponse({'status': 'success'})
+
+@login_required
+def edit_answer(request, pk):
+    answer = get_object_or_404(Answer, pk=pk)
+    if answer.user != request.user:
+        return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            answer.content = data.get('content')
+            answer.save()
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+@login_required
+def delete_answer(request, pk):
+    answer = get_object_or_404(Answer, pk=pk)
+    if answer.user != request.user:
+        return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
+
+    if request.method == 'POST':
+        answer.delete()
+        return JsonResponse({'status': 'success'})
