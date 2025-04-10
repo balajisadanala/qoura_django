@@ -77,7 +77,12 @@
                   {{request.user.first_name}}
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                  <li>
+                    <form method="post" action="{% url 'logout_app' %}">
+                      {% csrf_token %}
+                      <button type="submit" class="dropdown-item">Logout</button>
+                    </form>
+                  </li>
                 </ul>
               </li>
             </ul>
