@@ -35,19 +35,19 @@
               </div>
             </div>
 
-            <p class="card-text mt-2">{{ question.description }}</p>
+            <p class="card-text mt-2">Description:{{ question.description }}</p>
 
             <div class="d-flex justify-content-between align-items-center mt-3">
               <div class="btn-group question-voting" data-id="{{ question.id }}">
                 <button class="btn btn-sm btn-outline-success vote-up
                         {% if question|user_vote_status:request.user == 'upvoted' %}active{% endif %}"
                         data-vote-type="up">
-                    <i class="bi bi-arrow-up"></i> Upvote (<span class="upvote-count">{{ question.upvotes.count }}</span>)
+                    <i class="bi bi-arrow-up"></i> Upvote-Question (<span class="upvote-count">{{ question.upvotes.count }}</span>)
                 </button>
                 <button class="btn btn-sm btn-outline-danger vote-down
                         {% if question|user_vote_status:request.user == 'downvoted' %}active{% endif %}"
                         data-vote-type="down">
-                    <i class="bi bi-arrow-down"></i> Downvote (<span class="downvote-count">{{ question.downvotes.count }}</span>)
+                    <i class="bi bi-arrow-down"></i> Downvote-Question (<span class="downvote-count">{{ question.downvotes.count }}</span>)
                 </button>
             </div>
 
